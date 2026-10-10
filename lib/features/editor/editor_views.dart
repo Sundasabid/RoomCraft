@@ -878,25 +878,35 @@ class _CameraButton extends StatelessWidget {
     final c = context.colors;
     return PopupMenuButton<String>(
       tooltip: S.camera,
+      menuPadding: EdgeInsets.zero,
       onSelected: onChanged,
       position: PopupMenuPosition.under,
       itemBuilder: (context) => [
         for (final e in _options.entries)
           PopupMenuItem(
             value: e.key,
+            padding: EdgeInsets.zero,
+            // The whole row is covered, so a click anywhere on it reaches
+            // the menu and not the 3D view underneath (in the browser).
             child: Over3D(
-              child: Row(
-                children: [
-                  Icon(
-                    e.key == value
-                        ? Icons.radio_button_checked_rounded
-                        : Icons.radio_button_unchecked_rounded,
-                    size: 18,
-                    color: e.key == value ? c.primary : c.textSecondary,
-                  ),
-                  const SizedBox(width: Space.sm),
-                  Text(e.value),
-                ],
+              child: Container(
+                height: Sizes.touch,
+                constraints: const BoxConstraints(minWidth: 168),
+                padding: const EdgeInsets.symmetric(horizontal: Space.md),
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Icon(
+                      e.key == value
+                          ? Icons.radio_button_checked_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      size: 18,
+                      color: e.key == value ? c.primary : c.textSecondary,
+                    ),
+                    const SizedBox(width: Space.sm),
+                    Text(e.value),
+                  ],
+                ),
               ),
             ),
           ),

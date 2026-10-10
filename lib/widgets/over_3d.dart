@@ -10,7 +10,13 @@ class Over3D extends StatelessWidget {
 
   final Widget child;
 
+  /// The transparent layer makes the whole control hit-testable, so Flutter
+  /// finds the control (a menu row, say) before the interceptor's own
+  /// element; otherwise the tap goes to that element and is lost.
   @override
-  Widget build(BuildContext context) =>
-      kIsWeb ? PointerInterceptor(child: child) : child;
+  Widget build(BuildContext context) => kIsWeb
+      ? PointerInterceptor(
+          child: ColoredBox(color: const Color(0x00000000), child: child),
+        )
+      : child;
 }
