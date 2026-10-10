@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/strings.dart';
 import '../core/theme/tokens.dart';
+import 'over_3d.dart';
 import 'pressable.dart';
 
 List<BoxShadow> softShadow(RoomCraftColors c) => [
@@ -114,12 +115,19 @@ Future<T?> showRoomCraftDialog<T>(
   required List<Widget> actions,
 }) => showDialog<T>(
   context: context,
-  builder: (context) => AlertDialog(
-    title: Text(title),
-    content: body,
-    contentPadding: const EdgeInsets.fromLTRB(Space.xl, Space.lg, Space.xl, 0),
-    actionsPadding: const EdgeInsets.all(Space.lg),
-    actions: actions,
+  builder: (context) => Over3D(
+    child: AlertDialog(
+      title: Text(title),
+      content: body,
+      contentPadding: const EdgeInsets.fromLTRB(
+        Space.xl,
+        Space.lg,
+        Space.xl,
+        0,
+      ),
+      actionsPadding: const EdgeInsets.all(Space.lg),
+      actions: actions,
+    ),
   ),
 );
 
@@ -133,9 +141,25 @@ Future<bool> showToast(
   final messenger = ScaffoldMessenger.of(context);
   messenger.hideCurrentSnackBar();
   final c = context.colors;
+  // Undo lives inside the content (not a SnackBarAction) so the whole toast
+  // can sit over the browser's 3D view and still take taps.
   final controller = messenger.showSnackBar(
     SnackBar(
-      content: Text(message),
+      content: Over3D(
+        child: Row(
+          children: [
+            Expanded(child: Text(message)),
+            if (withUndo)
+              TextButton(
+                onPressed: () => messenger.hideCurrentSnackBar(
+                  reason: SnackBarClosedReason.action,
+                ),
+                style: TextButton.styleFrom(foregroundColor: c.onToast),
+                child: const Text(S.undo),
+              ),
+          ],
+        ),
+      ),
       duration: withUndo ? Motion.toastUndo : Motion.toastShort,
       margin: EdgeInsets.fromLTRB(
         Space.lg,
@@ -143,13 +167,6 @@ Future<bool> showToast(
         Space.lg,
         Space.lg + bottomOffset,
       ),
-      action: withUndo
-          ? SnackBarAction(
-              label: S.undo,
-              textColor: c.onToast,
-              onPressed: () {},
-            )
-          : null,
     ),
   );
   final reason = await controller.closed;

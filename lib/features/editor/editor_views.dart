@@ -17,6 +17,7 @@ import '../../state/editor_controller.dart';
 import '../../state/editor_state.dart';
 import '../../state/settings_controller.dart';
 import '../../widgets/motion.dart';
+import '../../widgets/over_3d.dart';
 import '../../widgets/surfaces.dart';
 import 'editor_chrome.dart';
 import 'inspector_bar.dart';
@@ -297,27 +298,33 @@ class _EditorViewsState extends ConsumerState<EditorViews> {
     final compact = mode == ViewMode.both && widget.sheetOpen;
     return Row(
       children: [
-        ViewSwitch(
-          value: mode,
-          onChanged: (m) {
-            Haptics.selectionClick();
-            ref.read(settingsProvider.notifier).setViewMode(m);
-          },
+        Over3D(
+          child: ViewSwitch(
+            value: mode,
+            onChanged: (m) {
+              Haptics.selectionClick();
+              ref.read(settingsProvider.notifier).setViewMode(m);
+            },
+          ),
         ),
         const Spacer(),
         if (mode != ViewMode.plan && !compact) ...[
-          _CameraButton(
-            value: _preset,
-            onChanged: (p) {
-              setState(() => _preset = p);
-              _sync?.camera(p);
-            },
+          Over3D(
+            child: _CameraButton(
+              value: _preset,
+              onChanged: (p) {
+                setState(() => _preset = p);
+                _sync?.camera(p);
+              },
+            ),
           ),
           const SizedBox(width: Space.xs),
-          _OverlayButton(
-            icon: Icons.lightbulb_outline_rounded,
-            tooltip: S.lightingTitle,
-            onPressed: widget.onLighting,
+          Over3D(
+            child: _OverlayButton(
+              icon: Icons.lightbulb_outline_rounded,
+              tooltip: S.lightingTitle,
+              onPressed: widget.onLighting,
+            ),
           ),
         ],
       ],
@@ -325,7 +332,9 @@ class _EditorViewsState extends ConsumerState<EditorViews> {
   }
 
   /// Warnings, offline and preview notices, shown over the main view.
-  Widget _notices() => Column(
+  Widget _notices() => Over3D(child: _noticeColumn());
+
+  Widget _noticeColumn() => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       SlideBanner(
@@ -601,7 +610,7 @@ class _EditorViewsState extends ConsumerState<EditorViews> {
               child: AnimatedOpacity(
                 opacity: hidden ? 0 : 1,
                 duration: motion(context, Motion.fast),
-                child: InspectorBar(actions: widget.barActions),
+                child: Over3D(child: InspectorBar(actions: widget.barActions)),
               ),
             ),
           );
@@ -875,18 +884,20 @@ class _CameraButton extends StatelessWidget {
         for (final e in _options.entries)
           PopupMenuItem(
             value: e.key,
-            child: Row(
-              children: [
-                Icon(
-                  e.key == value
-                      ? Icons.radio_button_checked_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                  size: 18,
-                  color: e.key == value ? c.primary : c.textSecondary,
-                ),
-                const SizedBox(width: Space.sm),
-                Text(e.value),
-              ],
+            child: Over3D(
+              child: Row(
+                children: [
+                  Icon(
+                    e.key == value
+                        ? Icons.radio_button_checked_rounded
+                        : Icons.radio_button_unchecked_rounded,
+                    size: 18,
+                    color: e.key == value ? c.primary : c.textSecondary,
+                  ),
+                  const SizedBox(width: Space.sm),
+                  Text(e.value),
+                ],
+              ),
             ),
           ),
       ],

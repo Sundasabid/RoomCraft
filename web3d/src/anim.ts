@@ -35,8 +35,13 @@ export function cancel(key: string): void {
   tweens.delete(key);
 }
 
-/** Advances every tween; returns true while any is running. */
+/**
+ * Advances every tween. Returns true if any ran this frame, including one
+ * that just finished, so the frame where its done() acts (an item removed
+ * after its fade, say) is still drawn.
+ */
 export function tick(now: number): boolean {
+  const ran = tweens.size > 0;
   for (const t of [...tweens.values()]) {
     const raw = Math.min(1, (now - t.start) / t.duration);
     t.step(t.ease(raw));
@@ -45,5 +50,5 @@ export function tick(now: number): boolean {
       t.done?.();
     }
   }
-  return tweens.size > 0;
+  return ran;
 }

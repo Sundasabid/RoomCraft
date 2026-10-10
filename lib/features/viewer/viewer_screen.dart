@@ -14,6 +14,7 @@ import '../../state/settings_controller.dart';
 import '../../state/viewer_controller.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/live_badge.dart';
+import '../../widgets/over_3d.dart';
 import '../../widgets/placeholders.dart';
 import '../../widgets/surfaces.dart';
 import '../editor/editor_views.dart';
@@ -182,30 +183,32 @@ class _ViewerScreenState extends ConsumerState<ViewerScreen> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.all(Space.xl),
-                              child: RoomCraftCard(
-                                padding: const EdgeInsets.all(Space.xl),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.sensors_off_rounded,
-                                      size: 32,
-                                      color: c.textSecondary,
-                                    ),
-                                    const SizedBox(height: Space.md),
-                                    Text(
-                                      S.ownerStopped,
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge,
-                                    ),
-                                    const SizedBox(height: Space.xl),
-                                    PrimaryButton(
-                                      label: S.backToStart,
-                                      onPressed: () => context.go('/live'),
-                                    ),
-                                  ],
+                              child: Over3D(
+                                child: RoomCraftCard(
+                                  padding: const EdgeInsets.all(Space.xl),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.sensors_off_rounded,
+                                        size: 32,
+                                        color: c.textSecondary,
+                                      ),
+                                      const SizedBox(height: Space.md),
+                                      Text(
+                                        S.ownerStopped,
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge,
+                                      ),
+                                      const SizedBox(height: Space.xl),
+                                      PrimaryButton(
+                                        label: S.backToStart,
+                                        onPressed: () => context.go('/live'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -256,12 +259,14 @@ class _ViewerScreenState extends ConsumerState<ViewerScreen> {
         Positioned(
           top: Space.md,
           left: Space.md,
-          child: PresetPill(
-            value: _preset,
-            onChanged: (p) {
-              setState(() => _preset = p);
-              _sync?.camera(p);
-            },
+          child: Over3D(
+            child: PresetPill(
+              value: _preset,
+              onChanged: (p) {
+                setState(() => _preset = p);
+                _sync?.camera(p);
+              },
+            ),
           ),
         ),
       ],
