@@ -383,7 +383,10 @@ class _EditorState extends ConsumerState<_Editor> {
       plan: _plan,
       controller: _c,
       selectionText: _selectionText(s, unit),
-      barActions: _barActions(s),
+      // AI and sharing are not about one piece; their sheets hide its bar.
+      barActions: _sheet == EditorSheet.ai || _sheet == EditorSheet.share
+          ? const []
+          : _barActions(s),
       onItemAction: _itemAction,
       sheetOpen: _sheet != null && !landscape,
       onLighting: () => setState(() {

@@ -4,7 +4,9 @@
 
 RoomCraft is a mobile room planner. You build a room, furnish it in a 3D view and a 2D plan that stay in sync, get AI layout ideas that the app checks for safety before you can use them, and share a read-only live view with someone on another phone. There are no accounts and no sign-up.
 
-Built with Flutter, three.js and Supabase. Android first.
+Built with Flutter, three.js and Supabase. Runs on Android and in the browser.
+
+**Try it in the browser:** https://roomcraft-806.netlify.app
 
 ---
 
@@ -86,6 +88,8 @@ Messages are JSON with a type and a sequence number. Flutter sends only what cha
 | `item.preview` (drag position), `selection.set`, `warnings.set` | `tap`, `drag.start`, `drag.move`, `drag.end`, `drag.cancel` |
 | `draft.show` / `draft.hide`, `camera.preset`, `camera.focus`, `theme.set` | `selection.screen` (where to place the action bar), `error` |
 
+On Android the page runs in a WebView and talks over a JavaScript channel. On the web the same page runs in an iframe and both sides use `postMessage`. `Surface3D` hides the difference, so the rest of the app is identical. On a wide screen the web app sits in a phone-sized frame.
+
 The 3D side keeps an **id → mesh index** for picking and rebuilds only the items that changed. If the WebGL context is lost, it reloads once. If WebGL is unavailable, the plan keeps working on its own.
 
 ### Placement checks (`domain/checks`)
@@ -126,7 +130,7 @@ Errors map to clear messages: rate limited, AI unavailable, unusable answer, tim
 
 ### Saving, sync and merge
 
-- **Local.** Rooms are saved as JSON files in the app's documents folder. Each write goes to a temporary file that then replaces the old one, so a crash never leaves a half-written room. Saves are debounced by 300 ms.
+- **Local.** On Android, rooms are saved as JSON files in the app's documents folder; in the browser they go to browser storage. Each write goes to a temporary file that then replaces the old one, so a crash never leaves a half-written room. Saves are debounced by 300 ms.
 - **Cloud.** The cloud copy goes to the `projects` table (only its owner can see it), 2 s after the last change. Uploads also run when the app goes to the background. Waiting uploads and deletes are remembered across restarts and retried on reconnect.
 - **Rooms list.** The list merges local and cloud copies; the newer copy wins, and newer cloud copies are downloaded.
 - **Merge.** The copy last agreed with the cloud is kept on the phone. Before an upload, if the cloud moved on, `SceneMerge` does a **three-way merge**:
@@ -144,7 +148,7 @@ Errors map to clear messages: rate limited, AI unavailable, unusable answer, tim
 
 | Area | Choice |
 | --- | --- |
-| App | Flutter (Dart), Android minSdk 26 |
+| App | Flutter (Dart): Android (minSdk 26) and web |
 | State and routing | flutter_riverpod, go_router |
 | 2D plan | `CustomPaint` (furniture drawn from above with soft shadows) |
 | 3D | three.js + TypeScript, bundled by Vite into a single HTML file, shown in `webview_flutter` |
@@ -193,6 +197,7 @@ tool/                      3D build script, headless 3D renderer, design screens
    bash tool/build_3d.sh                  # only after changing web3d/
    flutter run --dart-define-from-file=env.json
    flutter build apk --release --dart-define-from-file=env.json
+   flutter build web --release --dart-define-from-file=env.json   # deploy build/web to any static host
    ```
 
 Without `env.json`, the app opens a "Setup needed" screen instead of failing.

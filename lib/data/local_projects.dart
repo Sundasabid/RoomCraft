@@ -3,24 +3,31 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../domain/scene/scene_json.dart';
+import 'web_projects.dart';
 
 /// Projects as JSON files in `<documents>/projects/<id>.json`.
 ///
 /// Writes go to a temporary file that is then renamed, so a crash never
 /// leaves a half-written project.
 class LocalProjectStore {
-  LocalProjectStore(this._root);
+  LocalProjectStore(Directory root) : _dir = root;
 
-  /// Uses the app documents folder.
+  /// For stores that keep rooms somewhere other than files (the browser).
+  LocalProjectStore.withoutFiles() : _dir = null;
+
+  /// Uses the app documents folder on phones and browser storage on the web.
   static Future<LocalProjectStore> open() async {
+    if (kIsWeb) return WebProjectStore.open();
     final docs = await getApplicationDocumentsDirectory();
     return LocalProjectStore(Directory('${docs.path}/projects'));
   }
 
-  final Directory _root;
+  final Directory? _dir;
+  Directory get _root => _dir!;
 
   File _file(String id) => File('${_root.path}/$id.json');
 

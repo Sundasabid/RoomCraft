@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,7 @@ import 'features/setup_needed/setup_needed_screen.dart';
 import 'features/viewer/viewer_screen.dart';
 import 'state/cloud_sync.dart';
 import 'state/settings_controller.dart';
+import 'widgets/web_frame.dart';
 
 /// The role comes from the route, never from stored state. First launch
 /// shows the welcome tour; after that the app opens on the Rooms tab.
@@ -144,6 +146,7 @@ class _RoomCraftAppState extends ConsumerState<RoomCraftApp> {
       darkTheme: RoomCraftTheme.dark(),
       themeMode: themeMode,
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) => kIsWeb ? WebFrame(child: child!) : child!,
     );
   }
 }

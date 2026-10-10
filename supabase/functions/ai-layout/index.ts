@@ -69,8 +69,15 @@ const MESSAGE: Record<Code, string> = {
   ai_timeout: 'The AI took too long. Nothing was changed.',
 };
 
+// The web build calls this from the browser, which needs CORS headers.
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+  new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
 const fail = (code: Code, upstream?: number, reason?: string) =>
   json({ error: { code, message: MESSAGE[code], ...(upstream ? { upstream, reason } : {}) } }, STATUS[code]);
@@ -121,6 +128,7 @@ function prompt(body: Any): string {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return fail('bad_request');
   let body: Any;
   try {

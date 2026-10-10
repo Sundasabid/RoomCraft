@@ -1,22 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import 'messages.dart';
 
-/// Two-way channel to the 3D layer running inside the WebView.
+/// Two-way channel to the 3D layer, whether it runs in a phone WebView or
+/// a browser iframe. [post] delivers one JSON message to the page; the host
+/// passes every message from the page to [receive].
 ///
 /// Outgoing messages wait until the page reports `ready`. `item.preview`
 /// messages are coalesced so only the newest per item goes out each frame.
 class SceneBridge {
-  SceneBridge(this.controller, {required this.onReady}) {
-    controller.addJavaScriptChannel('Bridge', onMessageReceived: _receive);
-  }
+  SceneBridge({required this.post, required this.onReady});
 
-  final WebViewController controller;
+  final void Function(String json) post;
 
   /// Called on every `ready`, including after a reload; the owner answers with
   /// `init`.
@@ -58,20 +56,14 @@ class SceneBridge {
 
   void _post(Map<String, Object?> message) {
     message['seq'] = ++_seq;
-    final literal = jsonEncode(jsonEncode(message));
-    unawaited(
-      controller
-          .runJavaScript(
-            'window.roomcraft && window.roomcraft.receive($literal)',
-          )
-          .catchError((Object e) => debugPrint('bridge send failed: $e')),
-    );
+    post(jsonEncode(message));
   }
 
-  void _receive(JavaScriptMessage raw) {
+  /// One message from the page, as JSON text.
+  void receive(String raw) {
     final Object? decoded;
     try {
-      decoded = jsonDecode(raw.message);
+      decoded = jsonDecode(raw);
     } on FormatException {
       return;
     }

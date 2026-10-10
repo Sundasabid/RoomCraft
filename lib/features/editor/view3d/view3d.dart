@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../bridge/messages.dart';
 import '../../../bridge/scene_bridge.dart';
 import '../../../core/strings.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../widgets/surfaces.dart';
+import 'surface.dart';
 
 /// False in widget tests, where no WebView exists.
 final view3dEnabledProvider = Provider<bool>((ref) => true);
@@ -38,7 +38,7 @@ class View3D extends ConsumerStatefulWidget {
 }
 
 class _View3DState extends ConsumerState<View3D> {
-  WebViewController? _controller;
+  Surface3D? _surface;
   SceneBridge? _bridge;
   StreamSubscription<WebMessage>? _sub;
   _Status _status = _Status.loading;
@@ -52,19 +52,9 @@ class _View3DState extends ConsumerState<View3D> {
       _status = _Status.unavailable;
       return;
     }
-    final controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..enableZoom(false)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onNavigationRequest: (r) =>
-              r.url.startsWith('file:') || r.url == 'about:blank'
-              ? NavigationDecision.navigate
-              : NavigationDecision.prevent,
-        ),
-      );
+    final surface = createSurface((json) => _bridge?.receive(json));
     final bridge = SceneBridge(
-      controller,
+      post: surface.post,
       onReady: () {
         _watchdog?.cancel();
         _bridge!.send(ToWeb.init, widget.buildInit(_bridge!));
@@ -73,7 +63,7 @@ class _View3DState extends ConsumerState<View3D> {
       },
     );
     _sub = bridge.messages.listen(_onMessage);
-    _controller = controller;
+    _surface = surface;
     _bridge = bridge;
     _load();
   }
@@ -86,7 +76,7 @@ class _View3DState extends ConsumerState<View3D> {
         setState(() => _status = _Status.unavailable);
       }
     });
-    unawaited(_controller!.loadFlutterAsset('assets/web3d/index.html'));
+    _surface!.load();
   }
 
   void _onMessage(WebMessage m) {
@@ -107,7 +97,7 @@ class _View3DState extends ConsumerState<View3D> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    unawaited(_controller?.setBackgroundColor(context.colors.background));
+    _surface?.setBackground(context.colors.background);
   }
 
   @override
@@ -115,21 +105,22 @@ class _View3DState extends ConsumerState<View3D> {
     _watchdog?.cancel();
     unawaited(_sub?.cancel());
     _bridge?.dispose();
+    _surface?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final controller = _controller;
+    final surface = _surface;
     return Semantics(
       label: S.view3dLabel,
       container: true,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (controller != null && _status != _Status.unavailable)
-            ExcludeSemantics(child: WebViewWidget(controller: controller)),
+          if (surface != null && _status != _Status.unavailable)
+            ExcludeSemantics(child: surface.build(context)),
           if (_status == _Status.unavailable)
             ColoredBox(
               color: c.surfaceAlt,
