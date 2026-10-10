@@ -1,0 +1,4 @@
+project_id = "ecrpouukolanaldiiyuh"
+
+[functions.ai-layout]
+verify_jwt = true

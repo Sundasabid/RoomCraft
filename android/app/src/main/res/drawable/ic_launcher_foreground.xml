@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- White L-shaped room with a sunflower sofa and a coral plant, on the
+     solid emerald background (ic_launcher_background). Same shapes as
+     LogoMark: tile coordinate t maps to 18 + 72 t. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="5.04"
+        android:fillColor="#00000000" android:strokeLineJoin="round"
+        android:pathData="M35.28,35.28 L72.72,35.28 L72.72,58.32 L58.32,58.32 L58.32,72.72 L35.28,72.72 Z"/>
+    <path android:fillColor="#FFC23D"
+        android:pathData="M44.28,41.76 L61.56,41.76 Q64.08,41.76 64.08,44.28 L64.08,48.6 Q64.08,51.12 61.56,51.12 L44.28,51.12 Q41.76,51.12 41.76,48.6 L41.76,44.28 Q41.76,41.76 44.28,41.76 Z"/>
+    <path android:fillColor="#FF6B4A"
+        android:pathData="M46.8,62.64 m-4.68,0 a4.68,4.68 0 1,0 9.36,0 a4.68,4.68 0 1,0 -9.36,0"/>
+</vector>

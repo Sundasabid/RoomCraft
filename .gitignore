@@ -1,0 +1,42 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+.idea/
+.metadata
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/debug
+android/app/profile
+android/app/release
+android/key.properties
+**/*.jks
+**/*.keystore
+
+# Secrets
+env.json
+
+# 3D bundle sources
+web3d/node_modules/
+web3d/dist/
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
+
+.DS_Store
+
+# Local design screenshots
+tool/screenshots/out/
+
+# Private working notes (kept locally, not published)
+MEMORY.md
+NOTES.md
+PHASES.md

@@ -1,0 +1,49 @@
+name: roomcraft
+description: "RoomCraft: plan a room in 2D and 3D, get AI layouts, share it live."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  collection: ^1.19.1
+  connectivity_plus: ^7.3.2
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+  path_provider: ^2.1.6
+  share_plus: ^13.3.1
+  shared_preferences: ^2.5.6
+  supabase_flutter: ^2.18.0
+  uuid: ^4.6.0
+  webview_flutter: ^4.14.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  fake_async: ^1.3.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/web3d/index.html
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
