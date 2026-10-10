@@ -40,3 +40,6 @@ tool/screenshots/out/
 MEMORY.md
 NOTES.md
 PHASES.md
+
+# Netlify CLI
+.netlify/
